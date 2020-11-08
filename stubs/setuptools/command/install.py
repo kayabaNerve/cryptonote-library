@@ -1,0 +1,3 @@
+class install:
+    def run(self) -> None:
+        ...

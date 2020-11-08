@@ -1,0 +1,3 @@
+class develop:
+    def run(self) -> None:
+        ...

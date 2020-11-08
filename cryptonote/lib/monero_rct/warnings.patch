@@ -1,0 +1,24 @@
+diff --git a/src/serialization/binary_archive.h b/src/serialization/binary_archive.h
+index 9f60cf31..bdfcf25e 100644
+--- a/src/serialization/binary_archive.h
++++ b/src/serialization/binary_archive.h
+@@ -42,11 +42,11 @@
+ #include "warnings.h"
+
+ /* I have no clue what these lines means */
+-PUSH_WARNINGS
+-DISABLE_VS_WARNINGS(4244)
++//PUSH_WARNINGS
++//DISABLE_VS_WARNINGS(4244)
+
+ //TODO: fix size_t warning in x32 platform
+
+ /*! \struct binary_archive_base
+  *
+  * \brief base for the binary archive type
+@@ -229,4 +229,4 @@ struct binary_archive<true> : public binary_archive_base<std::ostream, true>
+   }
+ };
+
+-POP_WARNINGS
++//POP_WARNINGS

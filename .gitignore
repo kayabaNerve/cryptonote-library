@@ -1,0 +1,10 @@
+#Python files.
+__pycache__
+.mypy_cache
+*.egg-info
+
+#Monero's shared library wrapper.
+*.so
+
+#pytest cache
+.pytest_cache
