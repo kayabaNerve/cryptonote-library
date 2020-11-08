@@ -1,5 +1,5 @@
 [submodule "cryptonote/lib/monero_rct/monero"]
-    path = cryptonote/lib/monero_rct/monero
-    url = https://github.com/monero-project/monero
-    branch = master
-    ignore = dirty
+	path = cryptonote/lib/monero_rct/monero
+	url = https://github.com/monero-project/monero
+  branch = master
+  ignore = dirty
