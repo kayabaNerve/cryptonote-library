@@ -1,8 +1,5 @@
 # Types.
-from typing import Callable, Dict, List, Tuple, IO, Any
-
-# Format Exception standard function.
-from traceback import format_exc
+from typing import Dict, List, Tuple, Any
 
 # urandom standard function.
 from os import urandom
@@ -16,16 +13,12 @@ import json
 # pytest lib.
 import pytest
 
-# Ed25519 lib.
-import cryptonote.lib.ed25519 as ed
-
 # Transaction/Block classes.
-from cryptonote.classes.blockchain import OutputIndex, Transaction, Block
+from cryptonote.classes.blockchain import OutputIndex
 
 # Crypto classes.
-from cryptonote.crypto.monero_crypto import InputState, OutputInfo, Crypto, MoneroCrypto
+from cryptonote.crypto.monero_crypto import InputState, OutputInfo, MoneroCrypto
 from cryptonote.crypto.monero_payment_id_crypto import MoneroPaymentIDCrypto
-from cryptonote.crypto.turtlecoin_crypto import TurtlecoinCrypto
 
 # Address and Wallet classes.
 from cryptonote.classes.wallet.address import Address

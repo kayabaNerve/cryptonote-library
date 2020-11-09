@@ -5,38 +5,38 @@
 # Parts taken from https://github.com/monero-project/mininero/blob/master/ed25519ietf.py
 
 # Types.
-from typing import List, Tuple
+from typing import Tuple, Any
 
 import operator as _oper
 
 from Cryptodome.Hash import keccak
 
-indexbytes = _oper.getitem
-int2byte = _oper.methodcaller("to_bytes", 1, "big")
+indexbytes: Any = _oper.getitem
+int2byte: Any = _oper.methodcaller("to_bytes", 1, "big")
 
-b = 256
-q = 2 ** 255 - 19
-l = 2 ** 252 + 27742317777372353535851937790883648493
+b: int = 256
+q: int = 2 ** 255 - 19
+l: int = 2 ** 252 + 27742317777372353535851937790883648493
 
 
-def expmod(b, e, m):
+def expmod(b: int, e: int, m: int) -> int:
     if e == 0:
         return 1
-    t = expmod(b, e // 2, m) ** 2 % m
+    t: int = expmod(b, e // 2, m) ** 2 % m
     if e & 1:
         t = (t * b) % m
     return t
 
 
-def inv(x):
+def inv(x: int) -> int:
     return expmod(x, q - 2, q)
 
 
-d = -121665 * inv(121666)
-I = expmod(2, (q - 1) // 4, q)
+d: int = -121665 * inv(121666)
+I: int = expmod(2, (q - 1) // 4, q)
 
 
-def xrecover(y):
+def xrecover(y: int) -> int:
     xx = (y * y - 1) * inv(d * y * y + 1)
     x = expmod(xx, (q + 3) // 8, q)
     if (x * x - xx) % q != 0:
@@ -46,31 +46,35 @@ def xrecover(y):
     return x
 
 
-def compress(P):
-    zinv = inv(P[2])
+UncompressedPoint = Tuple[int, int, int, int]
+CompressedPoint = Tuple[int, int]
+
+
+def compress(P: UncompressedPoint) -> CompressedPoint:
+    zinv: int = inv(P[2])
     return (P[0] * zinv % q, P[1] * zinv % q)
 
 
-def decompress(P):
+def decompress(P: CompressedPoint) -> UncompressedPoint:
     return (P[0], P[1], 1, P[0] * P[1] % q)
 
 
-By = 4 * inv(5)
-Bx = xrecover(By)
-B = [Bx % q, By % q]
+By: int = 4 * inv(5)
+Bx: int = xrecover(By)
+B: CompressedPoint = (Bx % q, By % q)
 
 
-def edwards(P, Q):
+def edwards(P: CompressedPoint, Q: CompressedPoint):
     x1 = P[0]
     y1 = P[1]
     x2 = Q[0]
     y2 = Q[1]
     x3 = (x1 * y2 + x2 * y1) * inv(1 + d * x1 * x2 * y1 * y2)
     y3 = (y1 * y2 + x1 * x2) * inv(1 - d * x1 * x2 * y1 * y2)
-    return [x3 % q, y3 % q]
+    return (x3 % q, y3 % q)
 
 
-def add(P, Q):
+def add(P: UncompressedPoint, Q: UncompressedPoint) -> UncompressedPoint:
     A = (P[1] - P[0]) * (Q[1] - Q[0]) % q
     B = (P[1] + P[0]) * (Q[1] + Q[0]) % q
     C = 2 * P[3] * Q[3] * d % q
@@ -82,28 +86,28 @@ def add(P, Q):
     return (E * F, G * H, F * G, E * H)
 
 
-def add_compressed(P, Q):
+def add_compressed(P: CompressedPoint, Q: CompressedPoint) -> CompressedPoint:
     return compress(add(decompress(P), decompress(Q)))
 
 
-def scalarmult(P, e):
+def scalarmult(P: CompressedPoint, e: int) -> CompressedPoint:
     if e == 0:
-        return [0, 1]
-    Q = scalarmult(P, e // 2)
-    Q = edwards(Q, Q)
+        return (0, 1)
+    q = scalarmult(P, e // 2)
+    q = edwards(q, q)
     if e & 1:
-        Q = edwards(Q, P)
-    return Q
+        q = edwards(q, P)
+    return q
 
 
-def encodeint(y):
+def encodeint(y: int) -> bytes:
     bits = [(y >> i) & 1 for i in range(b)]
     return b"".join(
         [int2byte(sum([bits[i * 8 + j] << j for j in range(8)])) for i in range(b // 8)]
     )
 
 
-def encodepoint(P):
+def encodepoint(P: CompressedPoint) -> bytes:
     x = P[0]
     y = P[1]
     bits = [(y >> i) & 1 for i in range(b - 1)] + [x & 1]
@@ -112,42 +116,42 @@ def encodepoint(P):
     )
 
 
-def bit(h, i):
+def bit(h: bytes, i: int) -> int:
     return (indexbytes(h, i // 8) >> (i % 8)) & 1
 
 
-def isoncurve(P):
+def isoncurve(P: CompressedPoint):
     x = P[0]
     y = P[1]
     return (-x * x + y * y - 1 - d * x * x * y * y) % q == 0
 
 
-def decodeint(s):
+def decodeint(s: bytes) -> int:
     return sum(2 ** i * bit(s, i) for i in range(0, b))
 
 
-def decodepoint(s):
+def decodepoint(s: bytes) -> CompressedPoint:
     y = sum(2 ** i * bit(s, i) for i in range(0, b - 1))
     x = xrecover(y)
     if x & 1 != bit(s, b - 1):
         x = q - x
-    P = [x, y]
+    P = (x, y)
     if not isoncurve(P):
         raise Exception("decoding point that is not on curve")
     return P
 
 
-def public_from_secret(k):
+def public_from_secret(k: bytes) -> bytes:
     keyInt = decodeint(k)
     aB = scalarmult(B, keyInt)
     return encodepoint(aB)
 
 
 # Code added for the CryptoNote library.
-C: List[bytes] = decodepoint(
+C: CompressedPoint = decodepoint(
     bytes.fromhex("8b655970153799af2aeadc9ff1add0ea6c7251d54154cfa92c173a0dd39c1f94")
 )
-COMMITMENT_MASK: bytes = (b"\1" + (b"\0" * 31))
+COMMITMENT_MASK: bytes = b"\1" + (b"\0" * 31)
 
 
 def H(d: bytes) -> bytes:
@@ -165,7 +169,9 @@ def Hs(d: bytes) -> bytes:
 
 
 def generate_subaddress_private_spend_key(
-    private_view_key: bytes, private_spend_key: bytes, index: Tuple[int, int],
+    private_view_key: bytes,
+    private_spend_key: bytes,
+    index: Tuple[int, int],
 ) -> int:
     """
     Generate a subaddress private spend key using the

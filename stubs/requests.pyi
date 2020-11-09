@@ -9,7 +9,7 @@ class Session:
     def post(
         self,
         url: str,
-        json: Union[Dict[str, Any], List[Any]] = {},
-        data: bytes = bytes(),
-        headers: Dict[str, str] = {},
+        json: Union[Dict[str, Any], List[Any]] = ...,
+        data: bytes = ...,
+        headers: Dict[str, str] = ...,
     ) -> Response: ...

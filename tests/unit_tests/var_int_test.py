@@ -32,10 +32,10 @@ def padded_varint_serializations_test() -> None:
         rpc_length: int = len(rpc_var_int)
 
         before: int = randint(0, 32)
-        for i in range(before):
+        for _ in range(before):
             var_int = bytes([randint(0, 255)]) + var_int
             rpc_var_int = bytes([randint(0, 255)]) + rpc_var_int
-        for i in range(randint(0, 32)):
+        for _ in range(randint(0, 32)):
             var_int += bytes([randint(0, 255)])
             rpc_var_int += bytes([randint(0, 255)])
 
@@ -44,5 +44,5 @@ def padded_varint_serializations_test() -> None:
         assert res[1] == before + length
 
         rpc_res: Tuple[int, int] = from_rpc_var_int(rpc_var_int, before)
-        assert res[0] == num
-        assert res[1] == before + length
+        assert rpc_res[0] == num
+        assert rpc_res[1] == before + rpc_length

@@ -98,86 +98,9 @@ rct::rctSig generate_ringct_signatures(
         NULL,
         indexes,
         out_keys,
-        {rct::RangeProofPaddedBulletproof, 2},
+        {rct::RangeProofPaddedBulletproof, 3},
         hw::get_device("default")
     );
-}
-
-rct::rctSig test_ringct_signatures(
-    std::vector<pybind11::bytes> amounts_arg,
-    std::vector<pybind11::bytes> out_public_keys_arg,
-
-    std::vector<pybind11::bytes> A_arg,
-    std::vector<pybind11::bytes> S_arg,
-    std::vector<pybind11::bytes> T1_arg,
-    std::vector<pybind11::bytes> T2_arg,
-    std::vector<pybind11::bytes> taux_arg,
-    std::vector<pybind11::bytes> mu_arg,
-    std::vector<std::vector<pybind11::bytes>> L_arg,
-    std::vector<std::vector<pybind11::bytes>> R_arg,
-    std::vector<pybind11::bytes> a_arg,
-    std::vector<pybind11::bytes> b_arg,
-    std::vector<pybind11::bytes> t_arg,
-
-    std::vector<std::vector<std::vector<pybind11::bytes>>> ss_arg,
-    std::vector<pybind11::bytes> cc_arg,
-    std::vector<pybind11::bytes> pseudo_outs_arg
-) {
-    rct::rctSig result;
-
-    result.ecdhInfo.resize(amounts_arg.size());
-    for (uint a = 0; a < amounts_arg.size(); a++) {
-        memcpy(result.ecdhInfo[a].amount.bytes, PYBIND11_BYTES_AS_STRING(amounts_arg[a].ptr()), 8);
-    }
-
-    result.outPk.resize(out_public_keys_arg.size());
-    for (uint k = 0; k < out_public_keys_arg.size(); k++) {
-        memcpy(result.outPk[k].mask.bytes, PYBIND11_BYTES_AS_STRING(out_public_keys_arg[k].ptr()), 32);
-    }
-
-    result.p.bulletproofs.resize(A_arg.size());
-    for (uint bp = 0; bp < A_arg.size(); bp++) {
-        memcpy(result.p.bulletproofs[bp].A.bytes, PYBIND11_BYTES_AS_STRING(A_arg[bp].ptr()), 32);
-        memcpy(result.p.bulletproofs[bp].S.bytes, PYBIND11_BYTES_AS_STRING(S_arg[bp].ptr()), 32);
-        memcpy(result.p.bulletproofs[bp].T1.bytes, PYBIND11_BYTES_AS_STRING(T1_arg[bp].ptr()), 32);
-        memcpy(result.p.bulletproofs[bp].T2.bytes, PYBIND11_BYTES_AS_STRING(T2_arg[bp].ptr()), 32);
-
-        memcpy(result.p.bulletproofs[bp].taux.bytes, PYBIND11_BYTES_AS_STRING(taux_arg[bp].ptr()), 32);
-        memcpy(result.p.bulletproofs[bp].mu.bytes, PYBIND11_BYTES_AS_STRING(mu_arg[bp].ptr()), 32);
-
-        result.p.bulletproofs[bp].L.resize(L_arg[bp].size());
-        for (uint i = 0; i < L_arg[bp].size(); i++) {
-            memcpy(result.p.bulletproofs[bp].L[i].bytes, PYBIND11_BYTES_AS_STRING(L_arg[bp][i].ptr()), 32);
-        }
-        result.p.bulletproofs[bp].R.resize(R_arg[bp].size());
-        for (uint i = 0; i < R_arg[bp].size(); i++) {
-            memcpy(result.p.bulletproofs[bp].R[i].bytes, PYBIND11_BYTES_AS_STRING(R_arg[bp][i].ptr()), 32);
-        }
-
-        memcpy(result.p.bulletproofs[bp].a.bytes, PYBIND11_BYTES_AS_STRING(a_arg[bp].ptr()), 32);
-        memcpy(result.p.bulletproofs[bp].b.bytes, PYBIND11_BYTES_AS_STRING(b_arg[bp].ptr()), 32);
-        memcpy(result.p.bulletproofs[bp].t.bytes, PYBIND11_BYTES_AS_STRING(t_arg[bp].ptr()), 32);
-    }
-
-    result.p.MGs.resize(ss_arg.size());
-    for (uint mg_i = 0; mg_i < ss_arg.size(); mg_i++) {
-        result.p.MGs[mg_i].ss.resize(ss_arg[mg_i].size());
-        for (uint ss_i = 0; ss_i < ss_arg[mg_i].size(); ss_i++) {
-            result.p.MGs[mg_i].ss[ss_i].resize(ss_arg[mg_i][ss_i].size());
-            for (uint ss_i_i = 0; ss_i_i < ss_arg[mg_i][ss_i].size(); ss_i_i++) {
-                memcpy(result.p.MGs[mg_i].ss[ss_i][ss_i_i].bytes, PYBIND11_BYTES_AS_STRING(ss_arg[mg_i][ss_i][ss_i_i].ptr()), 32);
-            }
-        }
-
-        memcpy(result.p.MGs[mg_i].cc.bytes, PYBIND11_BYTES_AS_STRING(cc_arg[mg_i].ptr()), 32);
-    }
-
-    result.p.pseudoOuts.resize(pseudo_outs_arg.size());
-    for (uint o = 0; o < pseudo_outs_arg.size(); o++) {
-        memcpy(result.p.pseudoOuts[o].bytes, PYBIND11_BYTES_AS_STRING(pseudo_outs_arg[o].ptr()), 32);
-    }
-
-    return result;
 }
 
 PYBIND11_MODULE(c_monero_rct, module) {
@@ -212,14 +135,15 @@ PYBIND11_MODULE(c_monero_rct, module) {
         .def_readonly("b", &rct::Bulletproof::b)
         .def_readonly("t", &rct::Bulletproof::t);
 
-    pybind11::class_<rct::mgSig>(module, "MGSignature")
-        .def_readonly("ss", &rct::mgSig::ss)
-        .def_readonly("cc", &rct::mgSig::cc);
+    pybind11::class_<rct::clsag>(module, "CLSAG")
+        .def_readonly("s", &rct::clsag::s)
+        .def_readonly("c1", &rct::clsag::c1)
+        .def_readonly("D", &rct::clsag::D);
 
     pybind11::class_<rct::rctSigPrunable>(module, "RingCTPrunable")
         .def_readonly("pseudo_outs", &rct::rctSigPrunable::pseudoOuts)
         .def_readonly("bulletproofs", &rct::rctSigPrunable::bulletproofs)
-        .def_readonly("MGs", &rct::rctSigPrunable::MGs);
+        .def_readonly("CLSAGs", &rct::rctSigPrunable::CLSAGs);
 
     pybind11::class_<rct::rctSig>(module, "RingCTSignatures")
         .def_readonly("ecdh_info", &rct::rctSig::ecdhInfo)
@@ -229,5 +153,4 @@ PYBIND11_MODULE(c_monero_rct, module) {
 
     module.def("generate_key_image", &generate_key_image, "Generate a key image for a one-time key.");
     module.def("generate_ringct_signatures", &generate_ringct_signatures, "Generate RingCT Signatures for the given data.");
-    module.def("test_ringct_signatures", &test_ringct_signatures, "Generate RingCT Signatures with the passed in data.");
 }

@@ -10,7 +10,7 @@ from collections import deque
 from os import urandom
 
 # Ed25519 lib.
-from cryptonote.lib import ed25519 as ed
+import cryptonote.lib.ed25519 as ed
 
 # Address class.
 from cryptonote.classes.wallet.address import Address
@@ -73,7 +73,10 @@ class WatchWallet:
                     result[index] = new_inputs[index]
         return dict(result)
 
-    def load_state(self, state: Union[int, Dict[str, Any]],) -> None:
+    def load_state(
+        self,
+        state: Union[int, Dict[str, Any]],
+    ) -> None:
         """Load the state."""
 
         self.last_block: int
@@ -184,7 +187,8 @@ class WatchWallet:
         )
 
     def can_spend(
-        self, tx: Transaction,
+        self,
+        tx: Transaction,
     ) -> Tuple[List[bytes], Dict[OutputIndex, OutputInfo]]:
         """
         Returns the found payment IDs and spendable outputs (OutputInfos indexed by OutputIndexes).

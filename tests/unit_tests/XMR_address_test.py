@@ -1,5 +1,5 @@
 # Types.
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 # Address class.
 from cryptonote.classes.wallet.address import Address

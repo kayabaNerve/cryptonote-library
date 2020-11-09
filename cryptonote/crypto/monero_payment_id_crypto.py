@@ -4,7 +4,7 @@
 from typing import Set, List, Tuple, Optional, Union
 
 # Ed25519 lib.
-from cryptonote.lib import ed25519 as ed
+import cryptonote.lib.ed25519 as ed
 
 # MoneroCrypto class.
 from cryptonote.crypto.monero_crypto import (
@@ -33,14 +33,20 @@ class MoneroPaymentIDCrypto(MoneroCrypto):
         if isinstance(unique_factor, bytes):
             if len(unique_factor) == 0:
                 return (
-                    (ed.public_from_secret(key_pair[0]), key_pair[1],),
+                    (
+                        ed.public_from_secret(key_pair[0]),
+                        key_pair[1],
+                    ),
                     None,
                     self.network_bytes[0],
                     key_pair[1],
                 )
             else:
                 return (
-                    (ed.public_from_secret(key_pair[0]), key_pair[1],),
+                    (
+                        ed.public_from_secret(key_pair[0]),
+                        key_pair[1],
+                    ),
                     unique_factor,
                     self.network_bytes[1],
                     unique_factor,
@@ -49,7 +55,9 @@ class MoneroPaymentIDCrypto(MoneroCrypto):
             raise Exception("Invalid unique factor.")
 
     def get_payment_IDs(
-        self, shared_keys: List[bytes], payment_IDs: List[bytes],
+        self,
+        shared_keys: List[bytes],
+        payment_IDs: List[bytes],
     ) -> List[bytes]:
         """Returns the Transaction's payment IDs, decrypted if necessary."""
 
@@ -70,7 +78,10 @@ class MoneroPaymentIDCrypto(MoneroCrypto):
         return list(result)
 
     def generate_input_key(
-        self, output: OutputInfo, private_view_key: bytes, private_spend_key: bytes,
+        self,
+        output: OutputInfo,
+        private_view_key: bytes,
+        private_spend_key: bytes,
     ) -> bytes:
         """Generate the one-time private key associated with an input."""
 

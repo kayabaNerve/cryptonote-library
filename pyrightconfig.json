@@ -4,10 +4,11 @@
     "typingsPath": "stubs",
     "strict": [
         "cryptonote",
-        "stubs"
+        "stubs",
+        "tests"
     ],
+    "reportMissingModuleSource": false,
     "ignore": [
-        "cryptonote/lib/monero_rct/monero/*",
-        "cryptonote/lib/ed25519.py"
+        "cryptonote/lib/monero_rct/monero/*"
     ]
 }

@@ -207,7 +207,9 @@ class Crypto(ABC):
 
     @abstractmethod
     def get_payment_IDs(
-        self, shared_keys: List[bytes], payment_IDs: List[bytes],
+        self,
+        shared_keys: List[bytes],
+        payment_IDs: List[bytes],
     ) -> List[bytes]:
         """Returns the Transaction's payment IDs, decrypted if necessary."""
 

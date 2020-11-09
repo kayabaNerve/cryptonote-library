@@ -16,10 +16,15 @@ import re
 from cryptonote.lib.var_int import to_var_int
 
 # Ed25519 lib.
-from cryptonote.lib import ed25519 as ed
+import cryptonote.lib.ed25519 as ed
 
 # RingCT lib.
-import cryptonote.lib.monero_rct as rct
+import cryptonote.lib.monero_rct as _
+from cryptonote.lib.monero_rct.c_monero_rct import (
+    RingCTSignatures,
+    generate_key_image,
+    generate_ringct_signatures,
+)
 
 # Crypto class.
 from cryptonote.crypto.crypto import (
@@ -87,7 +92,7 @@ class MoneroSpendableTransaction(SpendableTransaction):
     """
 
     amount_keys: List[bytes] = []
-    signatures: Optional[rct.RingCTSignatures]
+    signatures: Optional[RingCTSignatures]
 
     def __init__(
         self,
@@ -139,7 +144,7 @@ class MoneroSpendableTransaction(SpendableTransaction):
             return (ed.H(prefix), bytes())
 
         # RangeCT below. All of our Transactions are Simple Padded Bulletproofs (type 4).
-        base: bytes = bytes([4])
+        base: bytes = bytes([5])
         base += to_var_int(self.fee)
 
         for o in range(len(self.output_keys)):
@@ -183,14 +188,14 @@ class MoneroSpendableTransaction(SpendableTransaction):
             for i in range(32):
                 prunable += bytes([bulletproof.t[i]])
 
-        for mg in self.signatures.prunable.MGs:
-            for ss in mg.ss:
-                for ss_i in ss:
-                    for i in range(32):
-                        prunable += bytes([ss_i[i]])
-
+        for cl in self.signatures.prunable.CLSAGs:
+            for s in cl.s:
+                for i in range(32):
+                    prunable += bytes([s[i]])
             for i in range(32):
-                prunable += bytes([mg.cc[i]])
+                prunable += bytes([cl.c1[i]])
+            for i in range(32):
+                prunable += bytes([cl.D[i]])
 
         for pseudo_out in self.signatures.prunable.pseudo_outs:
             for i in range(32):
@@ -345,7 +350,9 @@ class MoneroCrypto(Crypto):
             raise Exception("Invalid unique factor.")
 
     def get_payment_IDs(
-        self, shared_keys: List[bytes], payment_IDs: List[bytes],
+        self,
+        shared_keys: List[bytes],
+        payment_IDs: List[bytes],
     ) -> List[bytes]:
         """Returns the Transaction's payment IDs, decrypted if necessary."""
 
@@ -382,9 +389,9 @@ class MoneroCrypto(Crypto):
         amount_key: bytes = ed.Hs(shared_key + to_var_int(o))
 
         # P - Hs(8Ra || i)G
-        amount_key_G: List[int] = ed.scalarmult(ed.B, ed.decodeint(amount_key))
+        amount_key_G: ed.CompressedPoint = ed.scalarmult(ed.B, ed.decodeint(amount_key))
         # Make it negative so it can be subtracted by adding it.
-        amount_key_G[0] = -amount_key_G[0]
+        amount_key_G = (-amount_key_G[0], amount_key_G[1])
         spend_key: bytes = ed.encodepoint(
             ed.add_compressed(ed.decodepoint(output.key), amount_key_G)
         )
@@ -411,7 +418,10 @@ class MoneroCrypto(Crypto):
                 if (
                     ed.encodepoint(
                         ed.add_compressed(
-                            ed.scalarmult(ed.B, ed.decodeint(commitment),),
+                            ed.scalarmult(
+                                ed.B,
+                                ed.decodeint(commitment),
+                            ),
                             ed.scalarmult(ed.C, amount),
                         )
                     )
@@ -469,7 +479,10 @@ class MoneroCrypto(Crypto):
         )
 
     def generate_input_key(
-        self, output: OutputInfo, private_view_key: bytes, private_spend_key: bytes,
+        self,
+        output: OutputInfo,
+        private_view_key: bytes,
+        private_spend_key: bytes,
     ) -> bytes:
         """Generate the one-time private key associated with an input."""
 
@@ -478,7 +491,9 @@ class MoneroCrypto(Crypto):
                 (
                     ed.decodeint(output.amount_key)
                     + ed.generate_subaddress_private_spend_key(
-                        private_view_key, private_spend_key, output.subaddress,
+                        private_view_key,
+                        private_spend_key,
+                        output.subaddress,
                     )
                 )
                 % ed.l
@@ -487,14 +502,17 @@ class MoneroCrypto(Crypto):
             raise Exception("MoneroCrypto handed a non-Monero OutputInfo.")
 
     def generate_key_image(
-        self, output: OutputInfo, private_view_key: bytes, private_spend_key: bytes,
+        self,
+        output: OutputInfo,
+        private_view_key: bytes,
+        private_spend_key: bytes,
     ) -> bytes:
         """Calculate the key image for the specified input."""
 
         input_key: bytes = self.generate_input_key(
             output, private_view_key, private_spend_key
         )
-        return rct.generate_key_image(input_key, ed.public_from_secret(input_key))
+        return generate_key_image(input_key, ed.public_from_secret(input_key))
 
     def spendable_transaction(
         self,
@@ -614,11 +632,14 @@ class MoneroCrypto(Crypto):
 
     def sign(
         self,
-        tx: MoneroSpendableTransaction,
+        tx: SpendableTransaction,
         private_view_key: bytes,
         private_spend_key: bytes,
     ) -> None:
         """Sign a MoneroSpendableTransaction."""
+
+        if not isinstance(tx, MoneroSpendableTransaction):
+            raise Exception("Was told to sign a non-Monero Spendable Transaction.")
 
         # Generate the key image.
         for i in range(len(tx.inputs)):
@@ -652,7 +673,7 @@ class MoneroCrypto(Crypto):
             ring.append(input_i.ring)
 
         # Create the RingCT signatures.
-        tx.signatures = rct.generate_ringct_signatures(
+        tx.signatures = generate_ringct_signatures(
             tx.serialize()[0],
             input_keys,
             tx.output_keys,

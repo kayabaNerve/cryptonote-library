@@ -1,12 +1,14 @@
 """Setup the CryptoNote Library."""
 
 # Types.
-from typing import List
+from typing import List, Optional
 
 # Change directory standard function. Used to build Monero and then the CMoneroRCT wrapper.
 from os import chdir
 
 # check_call standard function.
+import sys
+import sysconfig
 from subprocess import call, check_call, check_output
 
 # setuptools setup function and build modes.
@@ -30,7 +32,7 @@ def build_monero() -> None:
     # This comments out those macros.
     call("git apply ../warnings.patch".split())
 
-    check_call("cmake -BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=1 .".split())
+    check_call("cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=1 .".split())
     print("Built Monero's Makefiles.")
 
     check_call("make -j4".split())
@@ -38,16 +40,16 @@ def build_monero() -> None:
 
     chdir("..")
 
+    suffix: Optional[str] = sysconfig.get_config_var("EXT_SUFFIX")
+    if suffix is None:
+        suffix = ".so"
     wrapper_build: List[str] = (
         "g++ -O3 -Wall -shared -std=c++14 -fPIC".split()
-        + check_output("python3 -m pybind11 --includes".split()).decode("utf-8").split()
-        + "-Imonero/contrib/epee/include -Imonero/src c_monero_rct.cpp -o".split()
-        + (
-            "c_monero_rct"
-            + check_output("python3-config --extension-suffix".split()).decode("utf-8")
-        )
-        .strip()
+        + check_output([sys.executable] + "-m pybind11 --includes".split())
+        .decode("utf-8")
         .split()
+        + "-Imonero/contrib/epee/include -Imonero/src c_monero_rct.cpp -o".split()
+        + ("c_monero_rct" + suffix).strip().split()
         + "-Lmonero/src/crypto -lcncrypto".split()
         + "-Lmonero/src/device -ldevice".split()
         + "-Lmonero/src/ringct -lringct_basic -lringct".split()
@@ -92,7 +94,6 @@ setup(
         "cryptonote.classes.blockchain",
         "cryptonote.classes.wallet",
         "cryptonote.rpc",
-        "cryptonote.cli",
     ],
     install_requires=[
         "pybind11",
@@ -100,8 +101,11 @@ setup(
         "pytest",
         "pytest-ordering",
         "click",
+        "requests",
     ],
     python_requires=">=3.6",
-    entry_points={"console_scripts": ["cryptonote = cryptonote.cli:entry"],},
-    cmdclass={"develop": Develop, "install": Install,},
+    cmdclass={
+        "develop": Develop,
+        "install": Install,
+    },
 )

@@ -184,7 +184,11 @@ class Address:
                 crypto.network_byte_length : (crypto.network_byte_length + 32)
             ]
         return Address(
-            crypto, (view_key, spend_key), payment_id, network_byte, address,
+            crypto,
+            (view_key, spend_key),
+            payment_id,
+            network_byte,
+            address,
         )
 
     def __eq__(self, other: Any) -> bool:

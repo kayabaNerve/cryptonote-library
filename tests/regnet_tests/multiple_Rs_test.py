@@ -19,17 +19,11 @@ from cryptonote.lib.var_int import to_var_int
 # OutputIndex and Transaction classes.
 from cryptonote.classes.blockchain import OutputIndex, Transaction
 
-# Address class.
-from cryptonote.classes.wallet.address import Address
-
 # OutputInfo and Crypto classes.
-from cryptonote.crypto.crypto import OutputInfo, Crypto
+from cryptonote.crypto.crypto import OutputInfo
 
 # Wallet classes.
 from cryptonote.classes.wallet.wallet import Wallet, WatchWallet
-
-# RPC class.
-from cryptonote.rpc.rpc import RPC
 
 # Test fixtures.
 from tests.regnet_tests.conftest import Harness

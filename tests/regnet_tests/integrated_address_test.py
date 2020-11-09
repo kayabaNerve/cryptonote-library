@@ -1,14 +1,11 @@
 # Types.
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple
 
 # urandom standard function.
 from os import urandom
 
 # randint standard function.
 from random import randint
-
-# JSON standard lib.
-import json
 
 # OutputIndex class.
 from cryptonote.classes.blockchain import OutputIndex
@@ -17,14 +14,8 @@ from cryptonote.classes.blockchain import OutputIndex
 from cryptonote.crypto.monero_crypto import OutputInfo
 from cryptonote.crypto.monero_payment_id_crypto import MoneroPaymentIDCrypto
 
-# Address class.
-from cryptonote.classes.wallet.address import Address
-
 # Wallet classes.
 from cryptonote.classes.wallet.wallet import Wallet, WatchWallet
-
-# RPC class.
-from cryptonote.rpc.rpc import RPC
 
 # Test fixtures.
 from tests.regnet_tests.conftest import Harness
@@ -55,7 +46,7 @@ def integrated_address_test(
     payment_IDs: List[bytes] = [urandom(8)]
     amounts: List[int] = []
     txs: List[bytes] = []
-    for i in range(10):
+    for _ in range(10):
         amounts.append(randint(ATOMIC_XMR, 40 * ATOMIC_XMR))
         txs.append(harness.send(watch.new_address(payment_IDs[-1]), amounts[-1]))
 

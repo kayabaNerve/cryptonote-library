@@ -8,7 +8,7 @@ This is not actively maintained, will likely throw a ton of complaints against t
 
 ### Requirements
 
-- Ubuntu.
+- Ubuntu/Arch Linux.
 - Python 3.6 or newer and a matching pip
 - A Python app which doesn't change its current working directory (due to how the CDLLs are loaded)
 
@@ -17,15 +17,11 @@ This is not actively maintained, will likely throw a ton of complaints against t
 Install compilation dependencies:
 
 ```
-sudo apt-get install gcc g++ build-essential make cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libpgm-dev libnorm-dev libunbound-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev qttools5-dev-tools libhidapi-dev libusb-dev libprotobuf-dev protobuf-compiler
+apt-get install build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libpgm-dev libunbound-dev libsodium-dev
 ```
 
-Setup Python 3.8
-
 ```
-sudo apt-get install python3.8 python3.8-dev
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 10
-python3 --version
+pacman -S base-devel cmake boost openssl zeromq libpgm unbound libsodium
 ```
 
 Install and compile for development:

@@ -29,14 +29,15 @@ class Bulletproof:
     b: Key
     t: Key
 
-class MGSignature:
-    ss: List[List[Key]]
-    cc: Key
+class CLSAGSignature:
+    s: List[Key]
+    c1: Key
+    D: Key
 
 class RingCTPrunable:
     pseudo_outs: List[Key]
     bulletproofs: List[Bulletproof]
-    MGs: List[MGSignature]
+    CLSAGs: List[CLSAGSignature]
 
 class RingCTSignatures:
     ecdh_info: List[ECDHTuple]
@@ -54,22 +55,4 @@ def generate_ringct_signatures(
     inputs: List[int],
     outputs: List[int],
     fee: int,
-) -> RingCTSignatures: ...
-def test_ringct_signatures(
-    amount: List[bytes],
-    out_public_keys: List[bytes],
-    A: List[bytes],
-    S: List[bytes],
-    T1: List[bytes],
-    T2: List[bytes],
-    taux: List[bytes],
-    mu: List[bytes],
-    L: List[List[bytes]],
-    R: List[List[bytes]],
-    a: List[bytes],
-    b: List[bytes],
-    t: List[bytes],
-    ss: List[List[List[bytes]]],
-    cc: List[bytes],
-    pseudo_outs: List[bytes],
 ) -> RingCTSignatures: ...

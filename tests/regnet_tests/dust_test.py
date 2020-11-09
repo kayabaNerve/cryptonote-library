@@ -1,23 +1,14 @@
 # Types.
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple
 
 # urandom standard function.
 from os import urandom
-
-# randint standard function.
-from random import randint
-
-# JSON standard lib.
-import json
 
 # pytest lib.
 import pytest
 
 # OutputIndex class.
 from cryptonote.classes.blockchain import OutputIndex
-
-# Address class.
-from cryptonote.classes.wallet.address import Address
 
 # OutputInfo class.
 from cryptonote.crypto.crypto import OutputInfo

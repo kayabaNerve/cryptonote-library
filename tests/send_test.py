@@ -11,7 +11,7 @@ from time import sleep
 import json
 
 # Transaction/Block classes.
-from cryptonote.classes.blockchain import OutputIndex, Transaction, Block
+from cryptonote.classes.blockchain import OutputIndex
 
 # Address class.
 from cryptonote.classes.wallet.address import Address

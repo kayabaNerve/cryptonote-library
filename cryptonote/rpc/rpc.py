@@ -149,8 +149,10 @@ def check_rpc_result(result: Any) -> None:
     """Check a RPC result for validity."""
 
     if isinstance(result, Dict):
-        if result["status"] != "OK":
-            raise RPCError("Node has a status other than OK: " + str(result["status"]))
+        if isinstance(result["status"], str):
+            status: str = result["status"]
+            if status != "OK":
+                raise RPCError("Node has a status other than OK: " + status)
         if result["untrusted"]:
             raise RPCError("Node is still syncing.")
 
