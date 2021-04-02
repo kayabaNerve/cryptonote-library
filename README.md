@@ -1,10 +1,8 @@
 # CryptoNote Library
 
-Written over a few months in 2019. Internally abstracted For CryptoNote in general, yet fully implemented for Monero v12. Wallet and WatchWallet functionality, not using Monero's wallet2 API/an external node. It's Python combined with a wrapper around the C for key image/RingCT signature generation. This makes it notable for providing a much larger amount of functionality independently, not to mention further context on Monero's internal API.
+Written over a few months in 2019. Internally abstracted For CryptoNote in general, yet fully implemented for Monero v14. Wallet and WatchWallet functionality, not using Monero's wallet2 API/an external wallet daemon/a node except for the WatchWallet (to discover and prepare transactions). It's Python combined with a wrapper around the C for key image/RingCT signature generation. This makes it notable for providing a much larger amount of functionality independently, not to mention further context on Monero's internal API.
 
-Porting it to the latest Monero version would require updating the signature structures/serializations. It MAY require updating the C API beyond these structs, yet it may be the same. That would be extremely beneficial due to the time spent figuring out those internal function calls.
-
-This is not actively maintained, will likely throw a ton of complaints against the latest Pyright version as it updates quite frequently, and does not use virtualenv. Anyone is welcome to create PRs, yet it isn't something which will be treated with the utmost urgency.
+This is not actively maintained and will likely throw a ton of complaints against the latest Pyright version as it updates quite frequently. Anyone is welcome to create PRs, yet it isn't something which will be treated with the utmost urgency.
 
 ### Requirements
 
