@@ -54,7 +54,7 @@ This library is automatically formatted by Black (`black .`).
 
 - Monero requires selected mixins, by median, be within the last 40% of outputs. This library doesn't handle this, instead trusting that the defined oldest output is within the last 40% of outputs.
 
-- Monero selects half its mixins from X to Y and then half from X to Z, where is X is the start of mixin-able outputs, Y is one week ago, and Z is now. This library selects all 10 from X to Z. This causes the real output to frequently be the last mixin.
+- Monero selects half its mixins from X to Y and then half from X to Z, where is X is the start of mixin-able outputs, Y is one week ago, and Z is now. This library selects all 10 from X to Z. This causes the real output to frequently be the last mixin if there's any decent rate of turnover.
 
 - Monero has a minimum fee this library checks against. Not all CryptoNote coins have this functionality (Turtlecoin doesn't). To implement the non-existent RPC route/calculation on such coins, have the RPC route return (1, 1) and the fee calculation function return 0.
 

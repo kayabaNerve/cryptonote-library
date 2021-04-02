@@ -218,6 +218,8 @@ class WatchWallet:
 
         for shared_key in shared_keys:
             # Check each output unless it's already been found spendable.
+            # Quality optimization due to how slow Python ed25519 is.
+            # Also necessary to stop exploits based on R reuse (handled elsewhere) and torsion points (not handled elsewhere).
             for o in range(len(tx.outputs)):
                 if o in spendable_outputs:
                     continue

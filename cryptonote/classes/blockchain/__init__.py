@@ -209,6 +209,9 @@ class Transaction:
             pass
 
         # Remove duplicate Rs.
+        # This isn't necessarily secure due to the existence of torsion points, where effectively duplicate Rs can remain.
+        # It must be partnered with a check if we already found an output was spendable.
+        # Since that check would be comprehensive, this is effectively an optimization.
         self.Rs = list(set(self.Rs))
         # Remove duplicate payment IDs.
         self.payment_IDs = list(set(self.payment_IDs))

@@ -223,7 +223,7 @@ class MoneroCrypto(Crypto):
                 bytes([0x2A]),
             ]
 
-            self.oldest_txo_property = 11000000
+            self.oldest_txo_property = 21000000
         else:
             self.network_bytes_property = [bytes([0x35]), bytes([0x36]), bytes([0x3F])]
 
