@@ -30,12 +30,12 @@ def build_monero() -> None:
     # The file using the macros has the following comment right above them:
     # /* I have no clue what these lines means */
     # This comments out those macros.
-    call("git apply ../warnings.patch".split())
+    check_call("git apply ../warnings.patch".split())
 
     check_call("cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=1 .".split())
     print("Built Monero's Makefiles.")
 
-    check_call("make -j4".split())
+    check_call("make -j2".split())
     print("Built Monero's shared libraries and a debug Monero node.")
 
     chdir("..")

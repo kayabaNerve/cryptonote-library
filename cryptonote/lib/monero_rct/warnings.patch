@@ -2,7 +2,7 @@ diff --git a/src/serialization/binary_archive.h b/src/serialization/binary_archi
 index 9f60cf31..bdfcf25e 100644
 --- a/src/serialization/binary_archive.h
 +++ b/src/serialization/binary_archive.h
-@@ -42,11 +42,11 @@
+@@ -42,13 +42,13 @@
  #include "common/varint.h"
  #include "span.h"
  #include "warnings.h"
@@ -18,8 +18,7 @@ index 9f60cf31..bdfcf25e 100644
  /*! \struct binary_archive_base
   *
   * \brief base for the binary archive type
-@@ -229,4 +229,4 @@ struct binary_archive<true> : public binary_archive_base<std::ostream, true>
-   }
+@@ -239,3 +239,3 @@ struct binary_archive<true> : public binary_archive_base<std::ostream, true>
  };
 
 -POP_WARNINGS
