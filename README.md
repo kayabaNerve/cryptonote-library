@@ -1,3 +1,5 @@
+# Deprecated due to open vulnerabilities and a lack of development
+
 # CryptoNote Library
 
 Written over a few months in 2019. Internally abstracted For CryptoNote in general, yet fully implemented for Monero v14. Wallet and WatchWallet functionality, not using Monero's wallet2 API/an external wallet daemon/a node except for the WatchWallet (to discover and prepare transactions). It's Python combined with a wrapper around the C for key image/RingCT signature generation. This makes it notable for providing a much larger amount of functionality independently, not to mention further context on Monero's internal API.
